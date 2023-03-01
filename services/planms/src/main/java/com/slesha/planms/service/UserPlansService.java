@@ -16,8 +16,12 @@ public class UserPlansService {
     @Autowired
     private UserPlanRepo repo;
 
+    @Autowired
+    KafkaTemplate<String,String> kafkaTemplate;
+
     @Cacheable(value = "userPlan",key = "#p0",sync = true)
     public List<UserPlan> findAllByEmailId(String emailId){
+        kafkaTemplate.send("userplans", emailId);
         return repo.findByEmailId(emailId)
         .stream()
         .map(x->{x.getUser().setPassword(""); 
