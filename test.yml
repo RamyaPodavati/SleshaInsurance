@@ -1,0 +1,51 @@
+version: "3.8"
+services:
+  insurancedb:
+    image: mysql:5.7
+    container_name: db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=my-secret-pw
+      - MYSQL_DATABASE=sleshainsurance
+    ports:
+      - 3323:3306
+    volumes:
+      - .mysql:/var/lib/mysql
+    networks:
+      - sleshainsnetwork
+  rediscache:
+    container_name: cache
+    depends_on:
+      - insurancedb
+    build: ./redis
+    restart: on-failure
+    ports:
+      - 2226:6379
+    networks:
+      - sleshainsnetwork
+  planms:
+    container_name: planms
+    depends_on:
+      - rediscache
+    build: ./services/planms
+    restart: on-failure
+    ports:
+      - 8889:8080
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.application.name": "planms",
+        "spring.datasource.url"  : "jdbc:mysql://insurancedb:3306/sleshainsurance?useSSL=false",
+        "spring.datasource.username" : "root",
+        "spring.datasource.password" : "my-secret-pw",
+        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQL5InnoDBDialect",
+        "spring.jpa.hibernate.ddl-auto" : "update",
+        "spring.cache.type":"redis",
+        "spring.redis.host":"rediscache",
+        "spring.redis.port":"6379",
+        "configs:spring.cache.cache-names":"plan, userPlan"}'
+    volumes:
+      - .m2:/root/.m2
+    networks:
+      - sleshainsnetwork
+networks:
+  sleshainsnetwork: {}
