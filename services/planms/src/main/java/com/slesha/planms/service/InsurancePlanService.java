@@ -3,6 +3,7 @@ package com.slesha.planms.service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -44,7 +45,14 @@ public class InsurancePlanService {
 
     @Cacheable(value = "plan",key = "'all'")
     public List<InsurancePlan> getPlans(){
-        return repo.findAll();
+
+        return repo.findAll().stream().
+        map((plans)->{final boolean isMarch = LocalDate.now().getMonthValue() == 3;
+                       if(isMarch){
+                          plans.setaveragePremium = averagePremium * 0.9;
+                          plans.setmaximumCoverage = maximumCoverage * 1.1;
+        }}).
+        collect(Collectors.toList());
     }
     public Optional<InsurancePlan> getPlan(Integer id){
         return repo.findById(id);
