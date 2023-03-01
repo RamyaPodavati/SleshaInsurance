@@ -45,14 +45,17 @@ public class InsurancePlanService {
 
     @Cacheable(value = "plan",key = "'all'")
     public List<InsurancePlan> getPlans(){
-
-        return repo.findAll().stream().
-        map((plans)->{final boolean isMarch = LocalDate.now().getMonthValue() == 3;
-                       if(isMarch){
-                          plans.setaveragePremium = averagePremium * 0.9;
-                          plans.setmaximumCoverage = maximumCoverage * 1.1;
-        }}).
-        collect(Collectors.toList());
+        final boolean isMarch = LocalDate.now().getMonthValue() == 3;
+        if(isMarch){
+            return repo.findAll().stream().map(x->{
+                x.setAveragePremium(x.getAvergaePremium()*0.9);
+                return x;
+            }).collect(Collectors.toList());
+        }
+        else{
+            return repo.findAll();
+        }
+      
     }
     public Optional<InsurancePlan> getPlan(Integer id){
         return repo.findById(id);
