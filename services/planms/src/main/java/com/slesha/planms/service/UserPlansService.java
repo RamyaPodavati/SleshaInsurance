@@ -21,7 +21,7 @@ public class UserPlansService {
 
     @Cacheable(value = "userPlan",key = "#p0",sync = true)
     public List<UserPlan> findAllByEmailId(String emailId){
-        kafkaTemplate.send("userplans", emailId);
+        kafkaTemplate.send("user-plans", emailId);
         return repo.findByEmailId(emailId)
         .stream()
         .map(x->{x.getUser().setPassword(""); 
