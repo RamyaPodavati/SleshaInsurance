@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+import org.springframework.kafka.core.KafkaTemplate;
 import javax.annotation.PostConstruct;
 
 import com.google.gson.Gson;
@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import java.time.*;
 
 @Service
 public class InsurancePlanService {
@@ -48,7 +49,8 @@ public class InsurancePlanService {
         final boolean isMarch = LocalDate.now().getMonthValue() == 3;
         if(isMarch){
             return repo.findAll().stream().map(x->{
-                x.setAveragePremium(x.getAvergaePremium()*0.9);
+                x.setAveragePremium((int)(x.getAveragePremium()*0.9));
+                x.setMaximumCoverage((int)(x.getMaximumCoverage()*1.1));
                 return x;
             }).collect(Collectors.toList());
         }
