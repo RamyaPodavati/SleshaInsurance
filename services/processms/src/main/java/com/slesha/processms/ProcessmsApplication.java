@@ -26,7 +26,7 @@ public class ProcessmsApplication {
 	}
 
 	@KafkaListener(topics = "user-plans", groupId = "group-id")
-	public void getUserPlans(String message){
+	public void userPlansListen(String message){
 		System.out.println("Received Messasge in user-plans - group-id: " + message);
 
 	}
